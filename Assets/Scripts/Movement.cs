@@ -4,83 +4,55 @@ using UnityEngine;
 
 public class Movement : RaycastController
 {
-    private Animator animator;
-
-    [SerializeField]
-    float vel;
-    [SerializeField]
-    [Tooltip("This value should be a positive integer")]
-    float mouseOffsetZ = 20;
-    
-    private Vector3 mousePosition;
-    private Vector3 trueMousePosition;
-    private bool clickedOnce = false;
-
+    // Variables
+    // I don't know what this does
     public CollisionInfo collisions;
 
-    // Start is called before the first frame update
-    void Start()
+    // Variables used all over the code
+    private Animate animate;
+    private Vector3 goal;
+    private float distanceFromBackground;
+    private float movementSpeed;
+
+    public Movement(ref Animate animate, float distanceFromBackground = 20F, float movementSpeed = 0.1F)
     {
-        trueMousePosition = player.position;
-        animator = player.GetComponent<Animator>();
+        this.animate                 = animate;
+        this.distanceFromBackground  = distanceFromBackground;
+        this.movementSpeed           = movementSpeed;
+
         base.Awake();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetMouseButton(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            Physics.Raycast(ray, out hit, Mathf.Infinity);
-            trueMousePosition = hit.point;
-
-            mousePosition = new Vector3(hit.point.x, hit.point.y, player.position.z);
-            clickedOnce = true;
-        }
-
-        Vector3 newPos = new Vector3(player.position.x, player.position.y, trueMousePosition.z - mouseOffsetZ);
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            clickedOnce = false;
-        }
-
-        Vector2 mousePos2D = new Vector2(trueMousePosition.x, trueMousePosition.y);
-
-        MovePlayer();
-        MoveSprite(); // Possibly make position private
-    }
-
-    private void MovePlayer()
+    private bool MoveTransform(Vector3 goal)
     {
         UpdateRaycastOrigins();
         collisions.Reset();
         
-        Vector3 movePoint = mousePosition;
+        Vector3 movePoint = goal;
 
-        if (movePoint.x != player.position.x) {
-            HorizontalCollisions(ref movePoint);
+        if (movePoint.x != transform.position.x) {
+            HorizontalCollisions(ref movePoint, ref goal);
         }
 
-        if (movePoint.y != player.position.y) {
-            VerticalCollisions(ref movePoint);
+        if (movePoint.y != transform.position.y) {
+            VerticalCollisions(ref movePoint, ref goal);
         }
 
         // XY velocity
         // Almost the same as player.Translate(velocity);
-        player.position = Vector3.MoveTowards(player.position, movePoint, vel);
-        mousePosition = movePoint;
+        transform.position = Vector3.MoveTowards(transform.position, movePoint, movementSpeed);
+        goal = movePoint;
 
         // Z velocity
-        movePoint = new Vector3(player.position.x, player.position.y, trueMousePosition.z - mouseOffsetZ);
-        player.position = Vector3.MoveTowards(player.position, movePoint, vel);
+        movePoint = new Vector3(transform.position.x, transform.position.y, goal.z - distanceFromBackground);
+        transform.position = Vector3.MoveTowards(transform.position, movePoint, movementSpeed);
+
+        return (transform.position != movePoint);
     }
 
-    public void HorizontalCollisions(ref Vector3 movePoint) 
+    public void HorizontalCollisions(ref Vector3 movePoint, ref Vector3 goal) 
     {
-        float distance = mousePosition.x - player.position.x;
+        float distance = goal.x - transform.position.x;
         float directionX = Mathf.Sign(distance);
 		float rayLength = Mathf.Abs(distance) + skinWidth;
 
@@ -123,11 +95,11 @@ public class Movement : RaycastController
 		}
 	}
 
-    public void VerticalCollisions(ref Vector3 movePoint)
+    public void VerticalCollisions(ref Vector3 movePoint, ref Vector3 goal)
     {
-        float distanceX = mousePosition.x - player.position.x;
+        float distanceX = goal.x - transform.position.x;
         float directionX = Mathf.Sign(distanceX);
-        float distanceY = mousePosition.y - player.position.y;
+        float distanceY = goal.y - transform.position.y;
 		float directionY = Mathf.Sign(distanceY);
 		float rayLength = Mathf.Abs(distanceY) + skinWidth;
 
@@ -167,17 +139,6 @@ public class Movement : RaycastController
             }
 		}
 	}
-
-    private void MoveSprite(){
-        if(player.position != mousePosition)
-        {
-            animator.SetBool("move", true);
-        }
-        else
-        {
-            animator.SetBool("move", false);
-        }
-    }
 
     public struct CollisionInfo
     {

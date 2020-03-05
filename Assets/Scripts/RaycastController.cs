@@ -10,19 +10,20 @@ public class RaycastController : MonoBehaviour
     public int horizontalRayCount = 4;
     public int verticalRayCount = 4;
 
-    [HideInInspector]
-    public float horizontalRaySpacing;
-    [HideInInspector]
-    public float verticalRaySpacing;
+    //[HideInInspector]
+    protected float horizontalRaySpacing;
+    //[HideInInspector]
+    protected float verticalRaySpacing;
 
-    public Transform player;
-    public BoxCollider2D playerCollider;
+    //[HideInInspector]
+    protected BoxCollider2D playerCollider;
+
     public RaycastOrigins raycastOrigins;
 
     public virtual void Awake()
     {
-        playerCollider = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>();
-        player = playerCollider.GetComponent<Transform>();
+        playerCollider = gameObject.GetComponent<BoxCollider2D>();
+        //transform = playerCollider.GetComponent<Transform>();
         CalculateRaySpacing();
     }
 
@@ -36,14 +37,14 @@ public class RaycastController : MonoBehaviour
         Bounds bounds = playerCollider.bounds;
         bounds.Expand(skinWidth * -2);
         
-        raycastOrigins.bottomLeft = new Vector2(player.position.x - bounds.extents.x,
-        player.position.y - bounds.extents.y);
-        raycastOrigins.bottomRight = new Vector2(player.position.x + bounds.extents.x,
-        player.position.y - bounds.extents.y);
-        raycastOrigins.topLeft = new Vector2(player.position.x - bounds.extents.x,
-        player.position.y + bounds.extents.y);
-        raycastOrigins.topRight = new Vector2(player.position.x + bounds.extents.x,
-        player.position.y + bounds.extents.y);
+        raycastOrigins.bottomLeft = new Vector2(transform.position.x - bounds.extents.x,
+        transform.position.y - bounds.extents.y);
+        raycastOrigins.bottomRight = new Vector2(transform.position.x + bounds.extents.x,
+        transform.position.y - bounds.extents.y);
+        raycastOrigins.topLeft = new Vector2(transform.position.x - bounds.extents.x,
+        transform.position.y + bounds.extents.y);
+        raycastOrigins.topRight = new Vector2(transform.position.x + bounds.extents.x,
+        transform.position.y + bounds.extents.y);
     }
 
     public void CalculateRaySpacing()
