@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using GameInterfaces;
 
 public class RenameLabels : MonoBehaviour
 {
-    [SerializeField] Player player;
+    [SerializeField] IStats<ComplexStats> player;
     private Text health;
     private Text magic;
     private Text experience;
@@ -22,8 +23,8 @@ public class RenameLabels : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        health.text = player.GetLife() + "%";
-        magic.text = player.GetMana() + "%";
-        experience.text = player.GetExp() + "/" + player.GetNLVL() + "XP";
+        health.text = player.GetHP() + "%";
+        magic.text = player.GetMP() + "%";
+        experience.text = player.GetEXP() + "/" + player.GetLVLCap() + "XP";
     }
 }
