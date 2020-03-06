@@ -48,7 +48,7 @@ namespace GameInterfaces
 
                 // Set movement
                 collisionBody = gameObject.GetComponent<BoxCollider2D>();
-                mousePoint    = new MousePoint();
+                mousePoint    = new MousePoint(transform.position);
                 movement      = new MouseMovement(collisionBody, collisionMask,              // Collision
                                                   animate,                                   // Animation
                                                   distanceFromBackground, movementSpeed,     // Movement settings
@@ -59,10 +59,9 @@ namespace GameInterfaces
             public void Update()
             {
                 // Move character
-                bool moving = movement.MoveTo(mousePoint.Get(transform.position));
-                Debug.Log("Moving? " + moving); // To know if it works
-                animate.Move(moving);
+                movement.MoveTo(mousePoint.Get());
 
+                // Update stats
                 stats.Update();
             }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GameInterfaces
 {
-    public class RaycastController : MonoBehaviour
+    public class RaycastController
     {
         // Collision
         private BoxCollider2D objectCollider;

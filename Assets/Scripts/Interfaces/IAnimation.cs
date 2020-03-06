@@ -14,7 +14,7 @@ namespace GameInterfaces
     }
 
     // Class containing player animation variables
-    public class PlayerAnimation : MonoBehaviour, IAnimation
+    public class PlayerAnimation : IAnimation
     {
         // Object's animator
         private Animator animate;
@@ -30,7 +30,7 @@ namespace GameInterfaces
         {
             if(moving)
             {
-                animate.SetBool("stop", false);
+                // animate.SetBool("stop", false);
                 animate.SetBool("move", true);
             }
             else
@@ -42,13 +42,14 @@ namespace GameInterfaces
         // Hard stops animation
         public void Stop()
         {
-            animate.SetBool("stop", true);
+            animate.SetBool("move", false);
+            // animate.SetBool("stop", true);
         }
 
         // Death animation (I believe this may be good to have even for props)
         public void Die()
         {
-            animate.SetBool("die", true);
+            // animate.SetBool("die", true);
         }
     }
 }

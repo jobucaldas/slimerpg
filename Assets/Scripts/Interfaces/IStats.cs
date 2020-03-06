@@ -24,7 +24,7 @@ namespace GameInterfaces
     }
 
     // Simple stats
-    public class SimpleStats : MonoBehaviour, IStats
+    public class SimpleStats : IStats
     {
         // Stats
         public int hp            { get; set; } // Health points

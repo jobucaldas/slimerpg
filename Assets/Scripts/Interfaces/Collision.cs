@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace GameInterfaces
 {
-    public class Collision : MonoBehaviour
+    public class Collision
     {
         public struct CollisionInfo
         {
@@ -15,14 +15,15 @@ namespace GameInterfaces
             }
         }
 
-        // I don't know what this does
+        // Transform
+        Transform transform;
+        // Collisions
         public CollisionInfo collisions;
-        private RaycastController raycaster;
         private BoxCollider2D collisionBody;
         private LayerMask collisionMask;
-        //[HideInInspector]
+        // Raycast
+        private RaycastController raycaster;
         private float horizontalRaySpacing;
-        //[HideInInspector]
         private float verticalRaySpacing;
 
         public Collision(RaycastController raycaster, BoxCollider2D collisionBody)
@@ -31,6 +32,8 @@ namespace GameInterfaces
             this.collisionBody = collisionBody;
             this.raycaster     = raycaster;
 
+            // Sets transform 
+            transform = collisionBody.gameObject.GetComponent<Transform>();
         }
 
         public void HorizontalCollisions(ref Vector3 movePoint) 

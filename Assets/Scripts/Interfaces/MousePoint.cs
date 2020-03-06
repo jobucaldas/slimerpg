@@ -2,14 +2,20 @@ using UnityEngine;
 
 namespace GameInterfaces
 {
-    public class  MousePoint : MonoBehaviour
+    public class  MousePoint
     {
         // Mouse Variables
         private bool clickedOnce  = false;
+        private Vector3 mousePos;
 
-        public Vector3 Get(Vector3 initialPos)
+        public MousePoint(Vector3 initialPos)
         {
-            Vector3 mousePoint = new Vector3(initialPos.x, initialPos.y, initialPos.z);
+            mousePos = initialPos;
+        }
+
+        public Vector3 Get()
+        {
+            Vector3 mousePoint = mousePos;
 
             if (Input.GetMouseButton(0))
             {
@@ -17,6 +23,7 @@ namespace GameInterfaces
                 RaycastHit hit;
                 Physics.Raycast(ray, out hit, Mathf.Infinity);
                 mousePoint = hit.point;
+                mousePos = hit.point;
 
                 clickedOnce = true;
             }

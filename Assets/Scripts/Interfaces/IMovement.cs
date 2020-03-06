@@ -23,7 +23,7 @@ namespace GameInterfaces
     }
 
     // Movements from mouse position
-    public class MouseMovement : MonoBehaviour, IMovement
+    public class MouseMovement : IMovement
     {
         // Movement
         public float distanceFromBackground { get; }
@@ -31,12 +31,14 @@ namespace GameInterfaces
         public Vector3 movePoint            { get; private set; }
 
         // Objects
+        // Transform
+        public Transform transform;
+        // Animation
         public IAnimation animate           { get; set; }
-
         // Collision
         public Collision collision          { get; set; }
         public BoxCollider2D collisionBody  { get; set; }
-
+        // Raycast
         private RaycastController raycaster;
 
         // Initializer
@@ -47,6 +49,9 @@ namespace GameInterfaces
         {
             // Set animation
             this.animate                 = animate;                // Not created here so that it can be used from player
+
+            // Set transform
+            transform = collisionBody.gameObject.GetComponent<Transform>();
 
             // Set movement settings
             this.distanceFromBackground  = distanceFromBackground; // Distance from BG
@@ -63,6 +68,9 @@ namespace GameInterfaces
         // Move to point
         public bool MoveTo(Vector3 movePoint)
         {
+            Debug.Log($"Mouse: { movePoint }");
+            Vector3 mouseCurrent = movePoint;
+
             // Sets raycast to current
             raycaster.UpdateRaycastOrigins();
             collision.collisions.Reset();
@@ -83,13 +91,19 @@ namespace GameInterfaces
             // Almost the same as player.Translate(velocity);
             transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
             movePoint          = moveInto; // Move holder gets position
+            Debug.Log($"MovePoint: { movePoint }");
+            Debug.Log($"MoveInto:  { moveInto }");
 
             // Z velocity (separate so movement is still 2D)
             moveInto           = new Vector3(transform.position.x, transform.position.y, // Current player XY
                                              movePoint.z - distanceFromBackground);      // Z move point minus distance from BG
             transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
 
-            return (transform.position != moveInto); // Returns if moving or not
+            bool moving = ((mouseCurrent - new Vector3(0, 0, distanceFromBackground)) != transform.position);
+            if(moving){ Debug.Log($"Moving: { moving }"); }
+            animate.Move(moving);
+
+            return moving; // Returns if moving or not
         }
     }
 }
