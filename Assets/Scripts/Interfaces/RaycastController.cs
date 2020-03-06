@@ -6,60 +6,40 @@ namespace GameInterfaces
 {
     public class RaycastController : MonoBehaviour
     {
-        private LayerMask collisionMask;
+        // Collision
+        private BoxCollider2D objectCollider;
+        private LayerMask collisionMask; // Mask used only inside
+        public float skinWidth           { get; private set; } = .015f;
 
-        public const float skinWidth = .015f;
-        public int horizontalRayCount = 4;
-        public int verticalRayCount = 4;
-
-        //[HideInInspector]
+        // Raycast
+        public int horizontalRayCount    { get; private set; } = 4;
+        public int verticalRayCount      { get; private set; } = 4;
         private float horizontalRaySpacing;
-        //[HideInInspector]
         private float verticalRaySpacing;
 
-        //[HideInInspector]
-        private BoxCollider2D playerCollider;
-
-        public RaycastOrigins raycastOrigins;
-
-        public float GetSkinWidth()
-        {
-            return skinWidth;
-        }
-
-        public int GetHorizontalRayCount()
-        {
-            return horizontalRayCount;
-        }
-
-        public int GetVerticalRayCount()
-        {
-            return verticalRayCount;
-        }
-
-        public RaycastOrigins GetRaycastOrigins()
-        {
-            return raycastOrigins;
-        }
-
-        public RaycastController(ref LayerMask collisionMask, ref BoxCollider2D playerCollider, float horizontalRaySpacing, float verticalRaySpacing)
-        {
-            this.playerCollider       = playerCollider; //gameObject.GetComponent<BoxCollider2D>();
-            this.collisionMask        = collisionMask;
-            this.horizontalRaySpacing = horizontalRaySpacing;
-            this.verticalRaySpacing   = verticalRaySpacing;
-            //transform = playerCollider.GetComponent<Transform>();
-            CalculateRaySpacing();
-        }
-
+        // Raycast settings
         public struct RaycastOrigins {
             public Vector2 topLeft, topRight;
             public Vector2 bottomLeft, bottomRight;
         }
+        public RaycastOrigins raycastOrigins;
+
+        // Transform
+        Transform transform;
+
+        public RaycastController(BoxCollider2D objectCollider, LayerMask collisionMask, float horizontalRaySpacing, float verticalRaySpacing)
+        {
+            this.objectCollider       = objectCollider; // gameObject.GetComponent<BoxCollider2D>();
+            this.collisionMask        = collisionMask;
+            this.horizontalRaySpacing = horizontalRaySpacing;
+            this.verticalRaySpacing   = verticalRaySpacing;
+            transform = objectCollider.GetComponent<Transform>();
+            CalculateRaySpacing();
+        }
         
         public void UpdateRaycastOrigins()
         {
-            Bounds bounds = playerCollider.bounds;
+            Bounds bounds = objectCollider.bounds;
             bounds.Expand(skinWidth * -2);
             
             raycastOrigins.bottomLeft = new Vector2(transform.position.x - bounds.extents.x,
@@ -74,7 +54,7 @@ namespace GameInterfaces
 
         public void CalculateRaySpacing()
         {
-            Bounds bounds = playerCollider.bounds;
+            Bounds bounds = objectCollider.bounds;
             bounds.Expand(skinWidth * -2);
 
             horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace GameInterfaces
 {
     // Interface for all animation
-    public interface IAnimation<T>
+    public interface IAnimation
     {
         // Basic movement
         void Move(bool moving);
@@ -14,13 +14,13 @@ namespace GameInterfaces
     }
 
     // Class containing player animation variables
-    public class PlayerAnimation : MonoBehaviour, IAnimation<PlayerAnimation>
+    public class PlayerAnimation : MonoBehaviour, IAnimation
     {
         // Object's animator
         private Animator animate;
 
         // Initializer
-        public PlayerAnimation(ref Animator animator)
+        public PlayerAnimation(Animator animator)
         {
             animate = animator;
         }

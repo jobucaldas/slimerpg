@@ -3,167 +3,93 @@
 namespace GameInterfaces
 {
     // Movement interface
-    public interface IMovement<T>
+    public interface IMovement
     {
-        bool MoveTo(Vector3 movePoint);
+        /* Variables */
+        // Objects
+        IAnimation animate           { get; set; }           // Animation
+        // Collision
+        Collision collision          { get; set; }           // Collisions
+        BoxCollider2D collisionBody  { get; set; }
+        
+        // Movement settings
+        float distanceFromBackground { get; }           // Distance from BG
+        Vector3 movePoint            { get; }      // Point where to move to
+        float movementSpeed          { get; set; } // Speed | Velocity
+
+        /* Functions */
+        // Moves parent object
+        bool MoveTo(Vector3 movePoint);            // Returns if moving or not
     }
 
-    public class MouseMovement : MonoBehaviour, IMovement<MouseMovement>
+    // Movements from mouse position
+    public class MouseMovement : MonoBehaviour, IMovement
     {
-        // I don't know what this does
-        public CollisionInfo collisions;
+        // Movement
+        public float distanceFromBackground { get; }
+        public float movementSpeed          { get; set; }
+        public Vector3 movePoint            { get; private set; }
 
-        // Variables used all over the code
-        private PlayerAnimation animate;
-        private Vector3 movePoint;
+        // Objects
+        public IAnimation animate           { get; set; }
+
+        // Collision
+        public Collision collision          { get; set; }
+        public BoxCollider2D collisionBody  { get; set; }
+
         private RaycastController raycaster;
-        private float distanceFromBackground;
-        private float movementSpeed;
 
-        private LayerMask collisionMask;
-        //[HideInInspector]
-        private float horizontalRaySpacing;
-        //[HideInInspector]
-        private float verticalRaySpacing;
-
-        private BoxCollider2D collisionBody;
-
-        public MouseMovement(ref BoxCollider2D collisionBody, ref PlayerAnimation animate, float distanceFromBackground, float movementSpeed, float horizontalRaySpacing, float verticalRaySpacing)
+        // Initializer
+        public MouseMovement(BoxCollider2D collisionBody, LayerMask collisionMask, // Collision 
+                             IAnimation animate,                                   // Animation 
+                             float distanceFromBackground, float movementSpeed,    // Movement settings
+                             float horizontalRaySpacing, float verticalRaySpacing) // Ray settings
         {
-            this.animate                 = animate;
-            this.distanceFromBackground  = distanceFromBackground;
-            this.movementSpeed           = movementSpeed;
-            this.collisionBody           = collisionBody;
+            // Set animation
+            this.animate                 = animate;                // Not created here so that it can be used from player
 
-            raycaster = new RaycastController(ref collisionMask, ref collisionBody, horizontalRaySpacing, verticalRaySpacing);
+            // Set movement settings
+            this.distanceFromBackground  = distanceFromBackground; // Distance from BG
+            this.movementSpeed           = movementSpeed;          // Speed | Velocity
+
+            // Start objects
+            // Sets raycaster
+            raycaster = new RaycastController(collisionBody, collisionMask,              // Collision settings
+                                              horizontalRaySpacing, verticalRaySpacing); // Ray settings
+            // Sets collision
+            collision = new Collision(raycaster, collisionBody);
         }
 
+        // Move to point
         public bool MoveTo(Vector3 movePoint)
         {
+            // Sets raycast to current
             raycaster.UpdateRaycastOrigins();
-            collisions.Reset();
+            collision.collisions.Reset();
             
+            // Hold move point
             Vector3 moveInto = movePoint;
 
+            // Horizontal collide
             if (moveInto.x != transform.position.x) {
-                HorizontalCollisions(ref moveInto, ref movePoint);
+                collision.HorizontalCollisions(ref moveInto); // Changed inside
             }
-
+            // Vertical collide
             if (moveInto.y != transform.position.y) {
-                VerticalCollisions(ref moveInto, ref movePoint);
+                collision.VerticalCollisions(ref moveInto);   // Changed inside
             }
 
             // XY velocity
             // Almost the same as player.Translate(velocity);
-            transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed);
-            movePoint = moveInto;
+            transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
+            movePoint          = moveInto; // Move holder gets position
 
-            // Z velocity
-            moveInto = new Vector3(transform.position.x, transform.position.y, movePoint.z - distanceFromBackground);
-            transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed);
+            // Z velocity (separate so movement is still 2D)
+            moveInto           = new Vector3(transform.position.x, transform.position.y, // Current player XY
+                                             movePoint.z - distanceFromBackground);      // Z move point minus distance from BG
+            transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
 
-            return (transform.position != moveInto);
-        }
-
-        public void HorizontalCollisions(ref Vector3 moveInto, ref Vector3 movePoint) 
-        {
-            float distance = movePoint.x - transform.position.x;
-            float directionX = Mathf.Sign(distance);
-            float rayLength = Mathf.Abs(distance) + raycaster.GetSkinWidth();
-
-            for (int i = 0; i < raycaster.GetHorizontalRayCount(); i ++) {
-                Vector2 rayOrigin = (directionX == -1) ? raycaster.GetRaycastOrigins().bottomLeft :
-                raycaster.GetRaycastOrigins().bottomRight;
-                
-                rayOrigin += Vector2.up * (horizontalRaySpacing * i);
-                
-                RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX,
-                rayLength, collisionMask);
-
-                Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
-
-                if (hit) {
-                    Debug.Log("Horizontal hit");
-                    rayLength = hit.distance;
-
-                    collisions.left = (directionX == -1);
-                    collisions.right = (directionX == 1);
-
-                    Bounds bounds = collisionBody.bounds;
-                    float hitPoint = hit.point.x - (raycaster.GetSkinWidth() + bounds.extents.x) * directionX;
-
-                    if (directionX == 1)
-                    {
-                        if (hitPoint < movePoint.x)
-                        {
-                            movePoint.x =  hitPoint;
-                        }
-                    }
-                    else if (directionX == -1)
-                    {
-                        if (hitPoint > movePoint.x)
-                        {
-                            movePoint.x = hitPoint;
-                        }
-                    }
-                }
-            }
-        }
-
-        public void VerticalCollisions(ref Vector3 movePoint, ref Vector3 goal)
-        {
-            float distanceX = goal.x - transform.position.x;
-            float directionX = Mathf.Sign(distanceX);
-            float distanceY = goal.y - transform.position.y;
-            float directionY = Mathf.Sign(distanceY);
-            float rayLength = Mathf.Abs(distanceY) + raycaster.GetSkinWidth();
-
-            for (int i = 0; i < raycaster.GetVerticalRayCount(); i ++) {
-                Vector2 rayOrigin = (directionY == -1) ? raycaster.GetRaycastOrigins().bottomLeft : 
-                    raycaster.GetRaycastOrigins().topLeft;
-                rayOrigin += Vector2.right * (verticalRaySpacing * i);
-                RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY,
-                    rayLength, collisionMask);
-
-                Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.white);
-
-                if (hit) {
-                    Debug.Log("Vertical hit");
-                    rayLength = hit.distance;
-
-                    collisions.below = (directionY == -1);
-                    collisions.above = (directionY == 1);
-
-                    Bounds bounds = collisionBody.bounds;
-                    float hitPoint = hit.point.y - (raycaster.GetSkinWidth() + bounds.extents.y) * directionY;
-
-                    if (directionY == 1)
-                    {
-                        if (hitPoint < movePoint.y)
-                        {
-                            movePoint.y =  hitPoint;
-                        }
-                    }
-                    else if (directionY == -1)
-                    {
-                        if (hitPoint > movePoint.y)
-                        {
-                            movePoint.y =  hitPoint;
-                        }
-                    }
-                }
-            }
-        }
-
-        public struct CollisionInfo
-        {
-            public bool above, below;
-            public bool left, right;
-
-            public void Reset() {
-                above = below = false;
-                left = right = false;
-            }
+            return (transform.position != moveInto); // Returns if moving or not
         }
     }
 }

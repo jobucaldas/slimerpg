@@ -1,97 +1,103 @@
 ﻿using UnityEngine;
-using GameInterface;
+using GameInterfaces;
 
 namespace GameInterfaces
 {
     namespace CharacterInterface
     {
-        public class Player : MonoBehaviour, ICharacter<Player>
+        public class Player : MonoBehaviour, ICharacter
         {
             /* User Input */
+            // Player data
+            [SerializeField] private int exp = 1;             // Current exp
+            [SerializeField] private float multiplier = 1.3F; // Stat multiplier
+
             // Movement
             [SerializeField]
-            private float movementSpeed = 0.1F;       // Movement speed
-            [SerializeField]
-            [Tooltip("This value should be a positive integer")]
-            private float distanceFromBackground = 20;
-            // Raycast
-            [SerializeField]
-            private LayerMask collisionMask;
-            [SerializeField]
-            private float horizontalRaySpacing;
-            [SerializeField]
-            private float verticalRaySpacing;
+            private float movementSpeed = 0.1F;        // Movement speed
+            [SerializeField] [Tooltip("This value should be a positive integer")]
+            private float distanceFromBackground = 20; // Distance setter
 
+            // Raycast
+            [SerializeField] private LayerMask collisionMask;
+            [SerializeField] private float horizontalRaySpacing;
+            [SerializeField] private float verticalRaySpacing;
+
+            /* Class specific */
             // Character basics
-            private IStats<ComplexStats> stats;
-            private IMovement<MouseMovement> movement;
+            public IMovement movement           { get; set; } // Movement handler
+            public IStats stats                 { get; set; } // Object's stats
+            public MousePoint mousePoint        { get; set; } // Gets mouse point (anytime)
 
             // Animator
-            private IAnimation<PlayerAnimation> animate;
-            private Animator animator;
-            private BoxCollider2D boxCollider2D;
+            public IAnimation animate           { get; set; } // Animation Handler
+            public Animator animator            { get; set; } // Actual animator in unity
+            public BoxCollider2D collisionBody  { get; set; } // Collider
 
+            /* Functions */
             // Start is called when object is spawned
             public void Start()
             {
                 // Creates stats
-                stats = new ComplexStats();
+                stats = new ComplexStats(exp, multiplier);
 
                 // Sets animator to gameobject's
                 animator = gameObject.GetComponent<Animator>();
-                animate  = new PlayerAnimator(ref animator);
-                animate.Stop();
+                animate  = new PlayerAnimation(animator);
+                animate.Stop(); // Starts in a stopped animation
 
                 // Set movement
-                boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
-                movement = new MouseMovement(ref boxCollider2D, ref animate, distanceFromBackground, movementSpeed, horizontalRaySpacing, verticalRaySpacing);
+                collisionBody = gameObject.GetComponent<BoxCollider2D>();
+                mousePoint    = new MousePoint();
+                movement      = new MouseMovement(collisionBody, collisionMask,              // Collision
+                                                  animate,                                   // Animation
+                                                  distanceFromBackground, movementSpeed,     // Movement settings
+                                                  horizontalRaySpacing, verticalRaySpacing); // Raycast settings
             }
 
             // Update is called every frame (do NOT add everything here)
             public void Update()
             {
                 // Move character
-                bool moving = this.movement.MoveTransform(this.mousePosition.Get());
-                Debug.Log("Moving? " + moving);
+                bool moving = movement.MoveTo(mousePoint.Get(transform.position));
+                Debug.Log("Moving? " + moving); // To know if it works
                 animate.Move(moving);
 
-                stats.Recover();
+                stats.Update();
             }
 
-            // Triggered
+            // Collision triggered
             public void OnTriggerEnter(Collider other)
             {
                 // If collides with enemy, life goes down by damage from enemy
                 if (other.gameObject.tag == "enemy")
                 {
-                    ReceiveDMG(other.gameObject);
+                    ReceiveDMG(other.gameObject.GetComponent<ICharacter>());
                 }
             }
 
             public void AddEXP(int exp)
             {
+                int lvl = stats.GetLVL();
+
                 // Does EXP math and saves it
                 stats.AddEXP(exp);
 
                 // LVL UP handler
-                if(stats.GetEXP()>=stats.GetLVLCap())
+                if(stats.GetLVL()>lvl) // Actually means: 'if current level higher than stored one, than'
                 {
                     /* To Do */
                     // Show gained exp on temp child label
                 }
             }
 
-            public void ReceiveDMG(ref GameObject enemy)
+            public void ReceiveDMG(ICharacter enemy)
             {
-                enemy = enemy.gameObject.GetComponent<Enemy>();
-                stats.ReceiveDMG(ref enemy.gameObject);
+                stats.ReceiveDMG(enemy);
 
-                if(stats.GetHP()<=0){
+                if(stats.hp <= 0){
                     // Animate death
                     animate.Die();
-
-                    // Add exp to enemy
-                    enemy.AddEXP(stats.GetEXP());
 
                     // Destroy instance
                     Destroy(gameObject);

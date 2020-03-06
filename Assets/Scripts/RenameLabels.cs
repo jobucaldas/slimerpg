@@ -1,16 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using GameInterfaces;
+using GameInterfaces.CharacterInterface;
 
 public class RenameLabels : MonoBehaviour
 {
-    [SerializeField] IStats<ComplexStats> player;
-    private Text health;
-    private Text magic;
-    private Text experience;
+    [SerializeField] Player player; // Stats inside player
+    private Text health;            // HP label
+    private Text magic;             // MP label
+    private Text experience;        // EXP label
 
     // Start is called before the first frame update
     void Start()
@@ -23,8 +20,8 @@ public class RenameLabels : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        health.text = player.GetHP() + "%";
-        magic.text = player.GetMP() + "%";
-        experience.text = player.GetEXP() + "/" + player.GetLVLCap() + "XP";
+        health.text = player.stats.hp + "%";
+        magic.text = player.stats.mp + "%";
+        experience.text = player.stats.exp + "/" + player.stats.FindNextLVLUp() + "XP";
     }
 }
