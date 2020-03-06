@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 4213617543317407881}
   - component: {fileID: 471294855216650710}
   - component: {fileID: 7536463858584582730}
-  - component: {fileID: 5306824050638948447}
   m_Layer: 9
   m_Name: Slime P1
   m_TagString: Player
@@ -164,26 +163,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c4abe00def338446b5e1000716612d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5306824050638948447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1451443278252750263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcbbad03db118bf40abfecc8e46edf66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  exp: 1
+  multiplier: 1.3
+  movementSpeed: 0.1
+  distanceFromBackground: 8
   collisionMask:
     serializedVersion: 2
-    m_Bits: 1
-  horizontalRayCount: 4
-  verticalRayCount: 4
-  horizontalRaySpacing: 0
-  verticalRaySpacing: 0
-  player: {fileID: 1451443278252750262}
-  playerCollider: {fileID: 0}
-  vel: 0.1
-  playerVelocity: {x: 0, y: 0, z: 0}
+    m_Bits: 1024
+  horizontalRaySpacing: 4
+  verticalRaySpacing: 4

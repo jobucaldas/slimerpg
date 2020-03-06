@@ -65,10 +65,9 @@ namespace GameInterfaces
             collision = new Collision(raycaster, collisionBody);
         }
 
-        // Move to point
+        // Move to point (returns if moving)
         public bool MoveTo(Vector3 movePoint)
         {
-            Debug.Log($"Mouse: { movePoint }");
             Vector3 mouseCurrent = movePoint;
 
             // Sets raycast to current
@@ -77,6 +76,8 @@ namespace GameInterfaces
             
             // Hold move point
             Vector3 moveInto = movePoint;
+
+            // Debug.Log($"Mouse: { mouseCurrent }\nMove Point: { moveInto }");
 
             // Horizontal collide
             if (moveInto.x != transform.position.x) {
@@ -89,18 +90,16 @@ namespace GameInterfaces
 
             // XY velocity
             // Almost the same as player.Translate(velocity);
-            transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(moveInto.x, moveInto.y, transform.position.z), movementSpeed); // Actual movement
             movePoint          = moveInto; // Move holder gets position
-            Debug.Log($"MovePoint: { movePoint }");
-            Debug.Log($"MoveInto:  { moveInto }");
 
             // Z velocity (separate so movement is still 2D)
-            moveInto           = new Vector3(transform.position.x, transform.position.y, // Current player XY
-                                             movePoint.z - distanceFromBackground);      // Z move point minus distance from BG
+            moveInto           = new Vector3(transform.position.x, transform.position.y,           // Current player XY
+                                             movePoint.z - distanceFromBackground);                // Z move point minus distance from BG
             transform.position = Vector3.MoveTowards(transform.position, moveInto, movementSpeed); // Actual movement
 
             bool moving = ((mouseCurrent - new Vector3(0, 0, distanceFromBackground)) != transform.position);
-            if(moving){ Debug.Log($"Moving: { moving }"); }
+            // if(moving){ Debug.Log($"Moving: { moving }"); }
             animate.Move(moving);
 
             return moving; // Returns if moving or not

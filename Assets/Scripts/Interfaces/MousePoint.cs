@@ -15,17 +15,27 @@ namespace GameInterfaces
 
         public Vector3 Get()
         {
-            Vector3 mousePoint = mousePos;
+            Vector3 mousePosition;
+            string colliderTag;
 
             if (Input.GetMouseButton(0))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 Physics.Raycast(ray, out hit, Mathf.Infinity);
-                mousePoint = hit.point;
-                mousePos = hit.point;
+                mousePosition = hit.point;
+
+                colliderTag = hit.collider.tag;
 
                 clickedOnce = true;
+
+                Debug.Log($"Hitting { colliderTag }");
+
+                // So that only the background is clickable
+                if(colliderTag.Equals("Background"))
+                {
+                    mousePos = mousePosition;
+                }
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -38,7 +48,7 @@ namespace GameInterfaces
              * Vector2 mousePos2D = new Vector2(goal.x, goal.y);
             */
 
-            return mousePoint;
+            return mousePos;
         }
     }
 }

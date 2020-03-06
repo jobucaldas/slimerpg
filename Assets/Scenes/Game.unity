@@ -11172,7 +11172,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1043943711}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -31, y: -1.78, z: -10}
+  m_LocalPosition: {x: -30, y: -2, z: -18}
   m_LocalScale: {x: 1, y: 1, z: -1}
   m_Children:
   - {fileID: 1385944202}
@@ -28573,12 +28573,17 @@ PrefabInstance:
     - target: {fileID: 1451443278252750262, guid: 352eeacad06cc474ab98468fb5ad8e0a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -31
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 1451443278252750262, guid: 352eeacad06cc474ab98468fb5ad8e0a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.78
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1451443278252750262, guid: 352eeacad06cc474ab98468fb5ad8e0a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8
       objectReference: {fileID: 0}
     - target: {fileID: 1451443278252750263, guid: 352eeacad06cc474ab98468fb5ad8e0a,
         type: 3}
@@ -28618,7 +28623,12 @@ PrefabInstance:
     - target: {fileID: 7536463858584582730, guid: 352eeacad06cc474ab98468fb5ad8e0a,
         type: 3}
       propertyPath: movementSpeed
-      value: 0.2
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7536463858584582730, guid: 352eeacad06cc474ab98468fb5ad8e0a,
+        type: 3}
+      propertyPath: distanceFromBackground
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5306824050638948447, guid: 352eeacad06cc474ab98468fb5ad8e0a, type: 3}

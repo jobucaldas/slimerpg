@@ -69,7 +69,7 @@ namespace GameInterfaces
             public void OnTriggerEnter(Collider other)
             {
                 // If collides with enemy, life goes down by damage from enemy
-                if (other.gameObject.tag == "enemy")
+                if (other.gameObject.tag == "Enemy")
                 {
                     ReceiveDMG(other.gameObject.GetComponent<ICharacter>());
                 }
