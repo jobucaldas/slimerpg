@@ -168,6 +168,9 @@ MonoBehaviour:
   multiplier: 1.3
   movementSpeed: 0.1
   distanceFromBackground: 8
+  layersToMoveTo:
+    serializedVersion: 2
+    m_Bits: 256
   collisionMask:
     serializedVersion: 2
     m_Bits: 1024
