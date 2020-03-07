@@ -17,22 +17,23 @@ namespace GameInterfaces
             private float movementSpeed = 0.1F;        // Movement speed
             [SerializeField] [Tooltip("This value should be a positive integer")]
             private float distanceFromBackground = 20; // Distance setter
+            [SerializeField] private LayerMask layersToMoveTo;
 
             // Raycast
-            [SerializeField] private LayerMask collisionMask;
+            [SerializeField] private LayerMask collisionMask = 8;
             [SerializeField] private float horizontalRaySpacing;
             [SerializeField] private float verticalRaySpacing;
 
             /* Class specific */
             // Character basics
-            public IMovement movement           { get; set; } // Movement handler
-            public IStats stats                 { get; set; } // Object's stats
-            public MousePoint mousePoint        { get; set; } // Gets mouse point (anytime)
+            public IMovement movement          { get; set; } // Movement handler
+            public IStats stats                { get; set; } // Object's stats
+            public MousePoint mousePoint       { get; set; } // Gets mouse point (anytime)
 
             // Animator
-            public IAnimation animate           { get; set; } // Animation Handler
-            public Animator animator            { get; set; } // Actual animator in unity
-            public BoxCollider2D collisionBody  { get; set; } // Collider
+            public IAnimation animate          { get; set; } // Animation Handler
+            public Animator animator           { get; set; } // Actual animator in unity
+            public BoxCollider2D collisionBody { get; set; } // Collider
 
             /* Functions */
             // Start is called when object is spawned
@@ -48,7 +49,7 @@ namespace GameInterfaces
 
                 // Set movement
                 collisionBody = gameObject.GetComponent<BoxCollider2D>();
-                mousePoint    = new MousePoint(transform.position);
+                mousePoint    = new MousePoint(transform.position, layersToMoveTo);
                 movement      = new MouseMovement(collisionBody, collisionMask,              // Collision
                                                   animate,                                   // Animation
                                                   distanceFromBackground, movementSpeed,     // Movement settings
